@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f7f6;
+  --foreground: #161515;
+  --brand-red: #d92d27;
+  --brand-red-dark: #ae201b;
+  --ink: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection { background: #f8c9c6; color: var(--ink); }
+
+/* Shared surface treatment keeps the existing functional forms consistent. */
+input, textarea, select { transition: border-color 150ms ease, box-shadow 150ms ease; }
+input:focus, textarea:focus, select:focus { border-color: var(--brand-red) !important; box-shadow: 0 0 0 3px rgb(217 45 39 / 12%); }
+button.bg-neutral-900, a.bg-neutral-900 { background-color: var(--brand-red) !important; }
+button.bg-neutral-900:hover, a.bg-neutral-900:hover { background-color: var(--brand-red-dark) !important; }
+
+.worknest-panel { box-shadow: 0 16px 45px -35px rgb(0 0 0 / 45%); }
+.worknest-nav-link { color: #bdbdbd; transition: background-color 150ms ease, color 150ms ease; }
+.worknest-nav-link:hover { background: #2a2929; color: #fff; }
+
+@keyframes auth-fade-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes auth-float { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(20px, -22px, 0) scale(1.08); } }
+.auth-enter { animation: auth-fade-up 700ms cubic-bezier(.22, 1, .36, 1) both; }
+.auth-orb { position: absolute; border-radius: 999px; filter: blur(1px); animation: auth-float 12s ease-in-out infinite; }
+.auth-orb-one { top: -11rem; right: -7rem; width: 28rem; height: 28rem; background: radial-gradient(circle, rgb(227 52 47 / 80%), rgb(227 52 47 / 0%)); }
+.auth-orb-two { bottom: -10rem; left: -8rem; width: 25rem; height: 25rem; background: radial-gradient(circle, rgb(117 22 20 / 80%), rgb(117 22 20 / 0%)); animation-delay: -5s; }
+
+@media (prefers-reduced-motion: reduce) { .auth-enter, .auth-orb { animation: none; } }

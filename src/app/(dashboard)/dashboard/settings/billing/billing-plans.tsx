@@ -1,0 +1,6 @@
+"use client";
+import { useActionState } from "react";
+import { selectPlan, type SubscriptionActionState } from "~/actions/subscription";
+import type { SubscriptionPlan } from "~/lib/constants/roles";
+const initial: SubscriptionActionState = {};
+export default function BillingPlans({ currentPlan, canManage }: { currentPlan: SubscriptionPlan; canManage: boolean }) { const [state, action, pending] = useActionState(selectPlan, initial); return <div className="mt-6 grid gap-4 sm:grid-cols-3">{(["free", "pro", "business"] as const).map((plan) => <form key={plan} action={action} className="rounded-lg border border-neutral-200 bg-white p-5"><input type="hidden" name="plan" value={plan}/><h2 className="font-semibold capitalize text-neutral-900">{plan}</h2><p className="mt-1 text-sm text-neutral-600">{plan === "free" ? "Essential workspace tools" : plan === "pro" ? "Growing teams and projects" : "Advanced organization controls"}</p><button disabled={!canManage || pending || plan === currentPlan} className="mt-4 rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">{plan === currentPlan ? "Current plan" : pending ? "Updating..." : "Select plan"}</button>{state.error && <p className="mt-2 text-xs text-red-600">{state.error}</p>}</form>)}</div>; }
