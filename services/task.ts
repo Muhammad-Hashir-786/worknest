@@ -452,6 +452,14 @@ export async function moveSubtask(
   return true;
 }
 
+/** Assigns a task only inside its organization and (when supplied) project. */
+export async function assignTask(taskId: string, organizationId: string, assigneeId: string | null): Promise<boolean> {
+  if (!isValidObjectId(taskId) || (assigneeId && !isValidObjectId(assigneeId))) return false;
+  await connectDB();
+  const result = await Task.findOneAndUpdate({ _id: taskId, organization: organizationId }, { assignee: assigneeId || null });
+  return Boolean(result);
+}
+
 /** Move a subtask to an arbitrary visible list index (used by drag and drop). */
 export async function reorderSubtask(
   subtaskId: string,
