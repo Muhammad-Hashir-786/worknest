@@ -12,6 +12,7 @@ interface OrganizationFields {
   companySize: string;
   logo: string;
   joinRequestsEnabled: boolean;
+  slug: string;
 }
 
 export default function OrganizationSettingsForm({
@@ -26,6 +27,7 @@ export default function OrganizationSettingsForm({
   return (
     <form action={formAction} className="space-y-4">
       <fieldset disabled={!canEdit} className="space-y-4 disabled:opacity-60">
+        <div><label htmlFor="slug" className="block text-sm font-medium text-neutral-700">Organization handle</label><div className="mt-1 flex items-center rounded-md border border-neutral-300 bg-white"><span className="pl-3 text-sm text-neutral-400">@</span><input id="slug" name="slug" type="text" defaultValue={organization.slug} required className="w-full rounded-md border-0 px-1 py-2 text-sm lowercase focus:outline-none" /></div><p className="mt-1 text-xs text-neutral-500">Members can find your organization with this unique handle.</p>{state.fieldErrors?.slug && <p className="mt-1 text-sm text-red-600">{state.fieldErrors.slug}</p>}</div>
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-neutral-700">
             Name

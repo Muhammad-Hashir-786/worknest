@@ -16,6 +16,7 @@ export const updateOrganizationSchema = z.object({
   // someone from saving the rest of the form over a strict URL check.
   logo: z.string().trim().max(500).optional().or(z.literal("")),
   joinRequestsEnabled: z.boolean().default(true),
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])?$/, "Use 2-50 lowercase letters, numbers, or hyphens."),
 });
 
 export const switchOrganizationSchema = z.object({

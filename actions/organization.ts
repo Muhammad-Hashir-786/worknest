@@ -105,15 +105,18 @@ export async function updateOrganization(
     companySize: formData.get("companySize"),
     logo: formData.get("logo"),
     joinRequestsEnabled: formData.get("joinRequestsEnabled") === "on",
+    slug: formData.get("slug"),
   });
 
   if (!parsed.success) {
     return { fieldErrors: fieldErrorsFrom(parsed.error.issues) };
   }
 
-  const { name, industry, companySize, logo, joinRequestsEnabled } = parsed.data;
+  const { name, industry, companySize, logo, joinRequestsEnabled, slug } = parsed.data;
 
   await connectDB();
+  const duplicate = await Organization.findOne({ slug, _id: { $ne: organization.id } }).select("_id").lean();
+  if (duplicate) return { fieldErrors: { slug: "That organization handle is already taken." } };
   // organization.id comes from requireOrgContext (session + verified
   // membership), never from the submitted form - so there's no way to post
   // a different organizationId and edit an org you don't belong to.
@@ -123,6 +126,7 @@ export async function updateOrganization(
     companySize,
     ...(logo ? { logo } : {}),
     joinRequestsEnabled,
+    slug,
   });
 
   revalidatePath("/dashboard/settings/organization");
