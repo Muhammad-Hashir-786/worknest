@@ -7,9 +7,12 @@ const milestoneSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true, maxlength: 200 },
     dueDate: { type: Date, required: true },
     completed: { type: Boolean, default: false },
+    position: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-milestoneSchema.index({ project: 1, dueDate: 1 });
-export default mongoose.models.Milestone || mongoose.model("Milestone", milestoneSchema);
+milestoneSchema.index({ project: 1, position: 1 });
+const existingMilestone = mongoose.models.Milestone;
+if (existingMilestone && !existingMilestone.schema.path("position")) existingMilestone.schema.add({ position: { type: Number, default: 0 } });
+export default existingMilestone || mongoose.model("Milestone", milestoneSchema);

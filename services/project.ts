@@ -106,6 +106,7 @@ export interface ProjectDetail {
   client: { id: string; name: string };
   createdBy: { id: string; name: string } | null;
   createdAt: Date;
+  isOverdue: boolean;
 }
 
 /**
@@ -150,6 +151,7 @@ export async function getProjectForOrg(
       : { id: "", name: "Unknown client" },
     createdBy: createdBy ? { id: createdBy._id.toString(), name: createdBy.name } : null,
     createdAt: project.createdAt,
+    isOverdue: computeIsOverdue(project.status as ProjectStatus, project.deadline),
   };
 }
 

@@ -24,6 +24,7 @@ import {
   toggleSubtask as toggleSubtaskRecord,
   deleteSubtask as deleteSubtaskRecord,
   moveSubtask as moveSubtaskRecord,
+  reorderSubtask as reorderSubtaskRecord,
   isValidAssignee,
   areValidDependencies,
   createNextRecurringTask,
@@ -436,6 +437,23 @@ export async function moveSubtask(
 
   await moveSubtaskRecord(parsed.data.subtaskId, taskId, organization.id, parsed.data.direction);
 
+  revalidatePath(`/dashboard/projects/${authz.projectId}/tasks/${taskId}`);
+  return { success: true };
+}
+
+export async function reorderSubtask(
+  _prevState: TaskActionState,
+  formData: FormData
+): Promise<TaskActionState> {
+  const { organization, role, user } = await requireOrgContext();
+  const taskId = formData.get("taskId");
+  const subtaskId = formData.get("subtaskId");
+  const targetIndex = Number(formData.get("targetIndex"));
+  if (typeof taskId !== "string" || typeof subtaskId !== "string" || !Number.isInteger(targetIndex)) return { error: "Invalid subtask." };
+  const authz = await canManageTaskSubtasks(taskId, organization.id, role, user.id);
+  if (!authz.ok) return { error: authz.error };
+  const moved = await reorderSubtaskRecord(subtaskId, taskId, organization.id, targetIndex);
+  if (!moved) return { error: "Subtask not found." };
   revalidatePath(`/dashboard/projects/${authz.projectId}/tasks/${taskId}`);
   return { success: true };
 }

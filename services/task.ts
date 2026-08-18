@@ -38,6 +38,7 @@ export interface TaskSummary {
   assignee: AssigneeRef | null;
   subtaskTotal: number;
   subtaskCompleted: number;
+  estimatedHours: number;
   // Computed here rather than in the card component - see the identical
   // note on ProjectSummary.isOverdue in services/project.ts.
   isOverdue: boolean;
@@ -114,6 +115,7 @@ export async function getTasksForProject(
       assignee: toAssigneeRef(task.assignee),
       subtaskTotal: counts?.total ?? 0,
       subtaskCompleted: counts?.completed ?? 0,
+      estimatedHours: task.estimatedHours ?? 0,
       isOverdue: computeIsOverdue(task.status as TaskStatus, dueDate),
       recurrence: (task.recurrence ?? "none") as TaskSummary["recurrence"],
     };
@@ -447,5 +449,23 @@ export async function moveSubtask(
   neighbour.position = thisPosition;
 
   await Promise.all([subtask.save(), neighbour.save()]);
+  return true;
+}
+
+/** Move a subtask to an arbitrary visible list index (used by drag and drop). */
+export async function reorderSubtask(
+  subtaskId: string,
+  taskId: string,
+  organizationId: string,
+  targetIndex: number
+): Promise<boolean> {
+  if (!isValidObjectId(subtaskId) || !Number.isInteger(targetIndex) || targetIndex < 0) return false;
+  if (!(await taskBelongsToOrg(taskId, organizationId))) return false;
+  const subtasks = await Subtask.find({ task: taskId }).sort({ position: 1 });
+  const fromIndex = subtasks.findIndex((item) => item._id.toString() === subtaskId);
+  if (fromIndex < 0) return false;
+  const [moved] = subtasks.splice(fromIndex, 1);
+  subtasks.splice(Math.min(targetIndex, subtasks.length), 0, moved);
+  await Promise.all(subtasks.map((item, index) => Subtask.updateOne({ _id: item._id }, { position: index })));
   return true;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { uploadAttachment, deleteAttachment, type AttachmentActionState } from "~/actions/attachment";
 import type { AttachmentSummary } from "~/services/attachment";
 
@@ -76,24 +76,22 @@ export default function Attachments({
 
 function UploadForm({ taskId, projectId }: { taskId: string; projectId: string }) {
   const [state, formAction, pending] = useActionState(uploadAttachment, initialState);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const [fileName, setFileName] = useState("");
+
+  function setFiles(files: FileList | null) {
+    const file = files?.[0];
+    if (!file || !inputRef.current) return;
+    const transfer = new DataTransfer(); transfer.items.add(file); inputRef.current.files = transfer.files; setFileName(file.name);
+  }
 
   return (
-    <form action={formAction} className="flex items-center gap-2">
+    <form action={formAction} className="space-y-2">
       <input type="hidden" name="taskId" value={taskId} />
       <input type="hidden" name="projectId" value={projectId} />
-      <input
-        name="file"
-        type="file"
-        required
-        className="flex-1 text-sm text-neutral-700 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-neutral-700 hover:file:bg-neutral-200"
-      />
-      <button
-        type="submit"
-        disabled={pending}
-        className="shrink-0 rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 disabled:opacity-50"
-      >
-        {pending ? "Uploading..." : "Upload"}
-      </button>
+      <label onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); setFiles(event.dataTransfer.files); }} className={`flex cursor-pointer items-center justify-center rounded-xl border border-dashed px-4 py-4 text-center text-sm transition ${dragging ? "border-[#d92d27] bg-red-50 text-[#b42318]" : "border-neutral-300 bg-neutral-50 text-neutral-500 hover:border-neutral-400"}`}><span>{fileName ? <><strong className="text-neutral-800">{fileName}</strong><span className="mt-1 block text-xs text-neutral-400">Ready to upload</span></> : <>Drop a file here or <strong className="ml-1 text-[#d92d27]">browse</strong><span className="mt-1 block text-xs text-neutral-400">Up to 15MB</span></>}</span><input ref={inputRef} name="file" type="file" required onChange={(event) => setFiles(event.target.files)} className="sr-only" /></label>
+      <button type="submit" disabled={pending || !fileName} className="rounded-xl border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 disabled:opacity-50">{pending ? "Uploading..." : "Upload file"}</button>
       {state.error && <span className="text-xs text-red-600">{state.error}</span>}
     </form>
   );

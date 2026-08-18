@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useTransition } from "react";
 import {
   createSubtask,
   toggleSubtask,
   deleteSubtask,
   moveSubtask,
+  reorderSubtask,
   type TaskActionState,
 } from "~/actions/task";
 import type { SubtaskSummary } from "~/services/task";
@@ -21,6 +22,11 @@ export default function Subtasks({
   subtasks: SubtaskSummary[];
   canManage: boolean;
 }) {
+  const [, startTransition] = useTransition();
+  function reorder(subtaskId: string, targetIndex: number) {
+    const data = new FormData(); data.set("taskId", taskId); data.set("subtaskId", subtaskId); data.set("targetIndex", String(targetIndex));
+    startTransition(() => { void reorderSubtask({}, data); });
+  }
   return (
     <div className="space-y-3">
       {subtasks.length === 0 ? (
@@ -33,6 +39,8 @@ export default function Subtasks({
               taskId={taskId}
               subtask={subtask}
               canManage={canManage}
+              index={index}
+              onReorder={reorder}
               isFirst={index === 0}
               isLast={index === subtasks.length - 1}
             />
@@ -51,19 +59,24 @@ function SubtaskRow({
   canManage,
   isFirst,
   isLast,
+  index,
+  onReorder,
 }: {
   taskId: string;
   subtask: SubtaskSummary;
   canManage: boolean;
   isFirst: boolean;
   isLast: boolean;
+  index: number;
+  onReorder: (subtaskId: string, targetIndex: number) => void;
 }) {
   const [toggleState, toggleAction] = useActionState(toggleSubtask, initialState);
   const [, moveAction] = useActionState(moveSubtask, initialState);
   const [, deleteAction] = useActionState(deleteSubtask, initialState);
 
   return (
-    <li className="flex items-center gap-3 px-3 py-2">
+    <li draggable={canManage} onDragStart={(event) => event.dataTransfer.setData("text/subtask-id", subtask.id)} onDragOver={(event) => { if (canManage) event.preventDefault(); }} onDrop={(event) => { event.preventDefault(); const dragged = event.dataTransfer.getData("text/subtask-id"); if (dragged && dragged !== subtask.id) onReorder(dragged, index); }} className="flex items-center gap-3 px-3 py-2 transition hover:bg-neutral-50">
+      {canManage && <span className="cursor-grab text-neutral-300" title="Drag to reorder" aria-hidden>⋮⋮</span>}
       <form action={toggleAction}>
         <input type="hidden" name="taskId" value={taskId} />
         <input type="hidden" name="subtaskId" value={subtask.id} />

@@ -16,6 +16,7 @@ export interface AttachmentSummary {
   uploadedBy: { id: string; name: string } | null;
   createdAt: Date;
 }
+export interface ProjectAttachmentSummary extends AttachmentSummary { taskId: string; taskTitle: string; }
 
 async function taskBelongsToOrg(taskId: string, organizationId: string): Promise<boolean> {
   if (!isValidObjectId(taskId)) return false;
@@ -47,6 +48,15 @@ export async function getAttachmentsForTask(
       createdAt: attachment.createdAt,
     };
   });
+}
+
+export async function getAttachmentsForProject(projectId: string, organizationId: string): Promise<ProjectAttachmentSummary[]> {
+  await connectDB();
+  const tasks = await Task.find({ project: projectId, organization: organizationId }).select("_id title").lean();
+  if (!tasks.length) return [];
+  const taskTitles = new Map(tasks.map((task) => [task._id.toString(), task.title]));
+  const rows = await Attachment.find({ task: { $in: tasks.map((task) => task._id) } }).populate("uploadedBy", "name").sort({ createdAt: -1 }).lean();
+  return rows.map((attachment) => { const uploadedBy = attachment.uploadedBy as unknown as { _id: { toString(): string }; name: string } | null; const taskId = attachment.task.toString(); return { id: attachment._id.toString(), name: attachment.name, size: attachment.size, mimeType: attachment.mimeType, uploadedBy: uploadedBy ? { id: uploadedBy._id.toString(), name: uploadedBy.name } : null, createdAt: attachment.createdAt, taskId, taskTitle: taskTitles.get(taskId) ?? "Task" }; });
 }
 
 type UploadResult = { ok: true; id: string } | { ok: false; error: string };

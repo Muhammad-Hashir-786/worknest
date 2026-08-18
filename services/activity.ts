@@ -2,6 +2,7 @@ import "server-only";
 import connectDB from "~/lib/db";
 import ActivityLog from "~/models/activity";
 import "~/models/user";
+import Task from "~/models/tasks";
 import type { ActivityAction } from "~/lib/constants/roles";
 
 /**
@@ -98,5 +99,18 @@ export async function getRecentActivity(
       name: entry.user?.name ?? "Unknown",
       avatar: entry.user?.avatar ?? "",
     },
+  }));
+}
+
+export async function getProjectActivity(projectId: string, organizationId: string, limit = 30): Promise<ActivityFeedEntry[]> {
+  await connectDB();
+  const tasks = await Task.find({ project: projectId, organization: organizationId }).select("_id").lean();
+  const entityIds = [projectId, ...tasks.map((task) => task._id.toString())];
+  const entries = await ActivityLog.find({ organization: organizationId, entityId: { $in: entityIds } })
+    .sort({ createdAt: -1 }).limit(limit).populate("user", "name avatar").lean();
+  return entries.map((entry) => ({
+    id: entry._id.toString(), action: entry.action, entityType: entry.entityType,
+    entityId: entry.entityId.toString(), metadata: entry.metadata ?? {}, createdAt: entry.createdAt,
+    user: { id: entry.user?._id?.toString() ?? "", name: entry.user?.name ?? "Unknown", avatar: entry.user?.avatar ?? "" },
   }));
 }

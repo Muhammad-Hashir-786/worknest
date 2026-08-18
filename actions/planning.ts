@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireOrgContext } from "~/lib/auth/current-org";
 import { can, PERMISSION_DENIED_MESSAGE } from "~/lib/permissions/permissions";
-import { createMilestone, toggleMilestone } from "~/services/milestone";
+import { createMilestone, toggleMilestone, reorderMilestone } from "~/services/milestone";
 import { createSavedView, deleteSavedView } from "~/services/saved-view";
 import { createTaskTemplate } from "~/services/task-template";
 import { PRIORITY } from "~/lib/constants/roles";
@@ -26,6 +26,15 @@ export async function toggleMilestoneAction(formData: FormData): Promise<void> {
   const id = formData.get("milestoneId"); const projectId = formData.get("projectId"); const completed = formData.get("completed");
   if (typeof id !== "string" || typeof projectId !== "string" || (completed !== "true" && completed !== "false")) return;
   await toggleMilestone(id, projectId, organization.id, completed === "true"); revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+export async function reorderMilestoneAction(formData: FormData): Promise<void> {
+  const { organization, role } = await requireOrgContext();
+  if (!can(role, "projects:update")) return;
+  const id = formData.get("milestoneId"); const projectId = formData.get("projectId"); const targetIndex = Number(formData.get("targetIndex"));
+  if (typeof id !== "string" || typeof projectId !== "string" || !Number.isInteger(targetIndex)) return;
+  await reorderMilestone(id, projectId, organization.id, targetIndex);
+  revalidatePath(`/dashboard/projects/${projectId}`);
 }
 
 export async function saveViewAction(_state: PlanningActionState, formData: FormData): Promise<PlanningActionState> {
