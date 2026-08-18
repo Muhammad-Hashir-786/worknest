@@ -15,6 +15,7 @@ export const updateOrganizationSchema = z.object({
   // logos are optional and we'd rather accept a slightly odd value than block
   // someone from saving the rest of the form over a strict URL check.
   logo: z.string().trim().max(500).optional().or(z.literal("")),
+  joinRequestsEnabled: z.boolean().default(true),
 });
 
 export const switchOrganizationSchema = z.object({

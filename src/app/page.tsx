@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "~/lib/auth/current-user";
+import { getCurrentOrgContext } from "~/lib/auth/current-org";
 
 export default async function Home() {
-  const user = await getCurrentUser();
-  redirect(user ? "/dashboard" : "/login");
+  const context = await getCurrentOrgContext();
+  if (!context) redirect("/login");
+  redirect(context.organization ? "/dashboard" : "/onboarding");
 }

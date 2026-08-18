@@ -8,6 +8,7 @@ import { requireOrgContext } from "../lib/auth/current-org";
 import { getCurrentUser } from "../lib/auth/current-user";
 import { setActiveOrganization } from "../lib/auth/current-org";
 import { can, PERMISSION_DENIED_MESSAGE } from "../lib/permissions/permissions";
+import { logActivity } from "~/services/activity";
 import {
   inviteMemberSchema,
   changeMemberRoleSchema,
@@ -70,6 +71,7 @@ export async function inviteMember(
     role: invitedRole,
     invitedBy: user.id,
   });
+  await logActivity({ organizationId: organization.id, userId: user.id, action: "invited", entityType: "Organization", entityId: organization.id, metadata: { email, role: invitedRole } });
 
   // No email provider is wired up for this submission (see .env.example) -
   // the invite link is surfaced directly in the UI instead of emailed, so
@@ -143,6 +145,7 @@ export async function changeMemberRole(
 
   membership.role = parsed.data.role;
   await membership.save();
+  await logActivity({ organizationId: organization.id, userId: user.id, action: "updated", entityType: "User", entityId: membership.user.toString(), metadata: { event: "role_changed", role: parsed.data.role } });
 
   revalidatePath(TEAM_PATH);
   return { success: true };
@@ -183,6 +186,7 @@ export async function removeMember(
   }
 
   await membership.deleteOne();
+  await logActivity({ organizationId: organization.id, userId: user.id, action: "deleted", entityType: "User", entityId: membership.user.toString(), metadata: { event: "member_removed" } });
 
   revalidatePath(TEAM_PATH);
   return { success: true };

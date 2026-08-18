@@ -23,8 +23,8 @@ export default async function DashboardLayout({
 
   const navItems = [
     { label: "Overview", href: "/dashboard", icon: "◈", section: "Workspace" }, { label: "Learn WorkNest", href: "/dashboard/learn", icon: "?", section: "Workspace" }, { label: "Projects", href: "/dashboard/projects", icon: "□", section: "Workspace" }, { label: "Timesheets", href: "/dashboard/timesheets", icon: "◷", section: "Workspace" },
-    { label: "Clients", href: "/dashboard/clients", icon: "○", section: "Workspace" }, { label: "Reports", href: "/dashboard/reports", icon: "▤", section: "Workspace" }, { label: "Team", href: "/dashboard/settings/team", icon: "♧", section: "Manage" },
-    { label: "Settings", href: "/dashboard/settings/organization", icon: "⚙", section: "Manage" },
+    { label: "Clients", href: "/dashboard/clients", icon: "○", section: "Workspace" }, { label: "Reports", href: "/dashboard/reports", icon: "▤", section: "Workspace" },
+    ...((role === "owner" || role === "admin") ? [{ label: "Team", href: "/dashboard/settings/team", icon: "♧", section: "Manage" }, { label: "Settings", href: "/dashboard/settings/organization", icon: "⚙", section: "Manage" }] : []),
     { label: "Notifications", href: "/dashboard/notifications", icon: "●", badge: unreadNotifications || undefined, section: "Manage" },
     { label: "Alert preferences", href: "/dashboard/settings/notifications", icon: "◌", section: "Manage" },
     ...(role === "owner" ? [{ label: "Billing", href: "/dashboard/settings/billing", icon: "◇", section: "Manage" }] : []),

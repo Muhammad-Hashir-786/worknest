@@ -11,6 +11,7 @@ interface OrganizationFields {
   industry: string;
   companySize: string;
   logo: string;
+  joinRequestsEnabled: boolean;
 }
 
 export default function OrganizationSettingsForm({
@@ -41,6 +42,8 @@ export default function OrganizationSettingsForm({
             <p className="mt-1 text-sm text-red-600">{state.fieldErrors.name}</p>
           )}
         </div>
+
+        <label className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3"><input name="joinRequestsEnabled" type="checkbox" defaultChecked={organization.joinRequestsEnabled} className="mt-1 h-4 w-4 accent-[#d92d27]" /><span><span className="block text-sm font-semibold text-neutral-800">Allow join requests</span><span className="mt-0.5 block text-xs leading-5 text-neutral-500">Let people find this organization by name and request access. Owners and admins still approve every request.</span></span></label>
 
         <div>
           <label htmlFor="industry" className="block text-sm font-medium text-neutral-700">

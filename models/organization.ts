@@ -12,6 +12,7 @@ const OrganizationSchema = new mongoose.Schema(
     },
     industry: { type: String, required: true, enum: INDUSTRIES },
     companySize: { type: String, required: true, enum: COMPANY_SIZES },
+    joinRequestsEnabled: { type: Boolean, default: true },
   },
   {
     timestamps: true,

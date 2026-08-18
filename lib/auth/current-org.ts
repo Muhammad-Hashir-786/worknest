@@ -17,6 +17,7 @@ export interface CurrentOrganization {
   logo: string;
   industry: string;
   companySize: string;
+  joinRequestsEnabled: boolean;
 }
 
 export interface OrgContext {
@@ -85,6 +86,7 @@ export async function getCurrentOrgContext(): Promise<OrgContext | null> {
       logo: org.logo,
       industry: org.industry,
       companySize: org.companySize,
+      joinRequestsEnabled: org.joinRequestsEnabled !== false,
     },
     role: membership.role,
   };

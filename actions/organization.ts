@@ -104,13 +104,14 @@ export async function updateOrganization(
     industry: formData.get("industry"),
     companySize: formData.get("companySize"),
     logo: formData.get("logo"),
+    joinRequestsEnabled: formData.get("joinRequestsEnabled") === "on",
   });
 
   if (!parsed.success) {
     return { fieldErrors: fieldErrorsFrom(parsed.error.issues) };
   }
 
-  const { name, industry, companySize, logo } = parsed.data;
+  const { name, industry, companySize, logo, joinRequestsEnabled } = parsed.data;
 
   await connectDB();
   // organization.id comes from requireOrgContext (session + verified
@@ -121,6 +122,7 @@ export async function updateOrganization(
     industry,
     companySize,
     ...(logo ? { logo } : {}),
+    joinRequestsEnabled,
   });
 
   revalidatePath("/dashboard/settings/organization");
