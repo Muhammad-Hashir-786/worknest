@@ -1,6 +1,7 @@
 import "server-only";
 import connectDB from "~/lib/db";
 import ActivityLog from "~/models/activity";
+import "~/models/user";
 import type { ActivityAction } from "~/lib/constants/roles";
 
 /**

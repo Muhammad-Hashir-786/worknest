@@ -3,6 +3,7 @@ import { isValidObjectId } from "mongoose";
 import connectDB from "../lib/db";
 import UserOrganization from "../models/user_organization";
 import User from "../models/user";
+import "../models/organization";
 import type { OrgRole } from "../lib/constants/roles";
 
 export interface OrganizationMembership {

@@ -3,6 +3,7 @@ import connectDB from "~/lib/db";
 import Task from "~/models/tasks";
 import TimeEntry from "~/models/time_entry";
 import Project from "~/models/projects";
+import "~/models/user";
 
 export interface WorkloadRow { userId: string; name: string; assigned: number; overdue: number; estimatedHours: number; loggedHours: number; }
 export interface TimesheetRow { userId: string; name: string; project: string; task: string; date: Date; hours: number; }

@@ -5,6 +5,7 @@ import { logout } from "~/actions/auth";
 import OrgSwitcher from "~/components/organization/org-switcher";
 import { getUnreadNotificationCount } from "~/services/notification";
 import SidebarNav from "~/components/dashboard/sidebar-nav";
+import WorkNestGuide from "~/components/ai/worknest-guide";
 
 export default async function DashboardLayout({
   children,
@@ -34,5 +35,6 @@ export default async function DashboardLayout({
       <div className="mt-6 hidden border-t border-neutral-800 pt-5 lg:block"><p className="text-sm font-medium text-white">{user.name}</p><p className="mt-0.5 text-xs capitalize text-neutral-500">{role}</p><form action={logout} className="mt-4"><button type="submit" className="text-sm text-neutral-400 hover:text-white">Log out</button></form></div>
     </aside>
     <div className="min-w-0 flex-1 lg:ml-64"><main className="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-10 lg:py-10">{children}</main></div>
+    <WorkNestGuide />
   </div>;
 }

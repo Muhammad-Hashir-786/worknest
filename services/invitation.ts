@@ -1,6 +1,7 @@
 import "server-only";
 import connectDB from "../lib/db";
 import Invitation from "../models/invitation";
+import "../models/organization";
 import UserOrganization from "../models/user_organization";
 import { generateToken } from "../lib/utils/token";
 import type { InvitableRole } from "../lib/constants/roles";

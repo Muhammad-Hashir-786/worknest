@@ -2,6 +2,7 @@ import "server-only";
 import { isValidObjectId } from "mongoose";
 import connectDB from "../lib/db";
 import Comment from "../models/comments";
+import "../models/user";
 import Task from "../models/tasks";
 
 export interface CommentSummary {

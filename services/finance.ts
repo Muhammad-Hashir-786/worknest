@@ -2,6 +2,8 @@ import "server-only";
 import { isValidObjectId } from "mongoose";
 import connectDB from "~/lib/db";
 import Project from "~/models/projects";
+import "~/models/client";
+import "~/models/tasks";
 import Invoice from "~/models/invoice";
 import { randomBytes } from "node:crypto";
 

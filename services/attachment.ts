@@ -2,6 +2,7 @@ import "server-only";
 import { isValidObjectId } from "mongoose";
 import connectDB from "../lib/db";
 import Attachment from "../models/attachment";
+import "../models/user";
 import Task from "../models/tasks";
 import { saveFile, deleteFileByKey } from "./storage";
 
