@@ -16,6 +16,14 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### WorkNest Guide (AI)
+
+The dashboard includes a server-backed WorkNest Guide. Copy `.env.example` to
+`.env.local` and set `GROQ_API_KEY` before using it. `GROQ_MODEL` is optional
+and defaults to `groq/compound-mini`. The key is only read by the protected
+`/api/guide` route; it is never sent to the browser. Requests require an
+authenticated organization member and are rate-limited per user.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
