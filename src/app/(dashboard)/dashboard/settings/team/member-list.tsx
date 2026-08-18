@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef } from "react";
-import Image from "next/image";
+import Avatar from "~/components/ui/avatar";
 import { changeMemberRole, removeMember, type TeamActionState } from "~/actions/invitation";
 import { INVITABLE_ROLES } from "~/lib/constants/roles";
 import type { OrgRole } from "~/lib/constants/roles";
@@ -67,15 +67,9 @@ function MemberRow({
     <tr>
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <Image
-            src={member.user.avatar}
-            alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 rounded-full object-cover"
-          />
+          <Avatar name={member.user.name} />
           <div>
-            <p className="font-medium text-neutral-900">
+              <p className="font-semibold text-neutral-900">
               {member.user.name} {isSelf && <span className="text-neutral-400">(you)</span>}
             </p>
             <p className="text-xs text-neutral-500">{member.user.email}</p>

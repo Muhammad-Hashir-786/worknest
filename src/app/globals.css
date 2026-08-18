@@ -18,7 +18,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection { background: #f8c9c6; color: var(--ink); }
@@ -30,6 +31,12 @@ button.bg-neutral-900, a.bg-neutral-900 { background-color: var(--brand-red) !im
 button.bg-neutral-900:hover, a.bg-neutral-900:hover { background-color: var(--brand-red-dark) !important; }
 
 .worknest-panel { box-shadow: 0 16px 45px -35px rgb(0 0 0 / 45%); }
+.dashboard-sidebar { background-image: radial-gradient(circle at 95% 8%, rgb(217 45 39 / 14%), transparent 24rem), linear-gradient(180deg, #171717 0%, #111 100%); }
+.dashboard-main { animation: dashboard-enter 500ms cubic-bezier(.22, 1, .36, 1) both; }
+* { scrollbar-width: thin; scrollbar-color: #d6d3d1 transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { border-radius: 999px; background: #d6d3d1; }
+@keyframes dashboard-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .worknest-nav-link { color: #bdbdbd; transition: background-color 150ms ease, color 150ms ease; }
 .worknest-nav-link:hover { background: #2a2929; color: #fff; }
 
@@ -40,4 +47,4 @@ button.bg-neutral-900:hover, a.bg-neutral-900:hover { background-color: var(--br
 .auth-orb-one { top: -11rem; right: -7rem; width: 28rem; height: 28rem; background: radial-gradient(circle, rgb(227 52 47 / 80%), rgb(227 52 47 / 0%)); }
 .auth-orb-two { bottom: -10rem; left: -8rem; width: 25rem; height: 25rem; background: radial-gradient(circle, rgb(117 22 20 / 80%), rgb(117 22 20 / 0%)); animation-delay: -5s; }
 
-@media (prefers-reduced-motion: reduce) { .auth-enter, .auth-orb { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .auth-enter, .auth-orb, .dashboard-main { animation: none; } }

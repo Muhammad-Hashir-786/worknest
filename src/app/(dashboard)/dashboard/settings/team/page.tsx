@@ -6,6 +6,7 @@ import { getPendingInvitations } from "~/services/invitation";
 import InviteMemberForm from "./invite-member-form";
 import MemberList from "./member-list";
 import PendingInvitations from "./pending-invitations";
+import PageHeader from "~/components/ui/page-header";
 
 export const metadata: Metadata = { title: "Team - WorkNest" };
 
@@ -20,34 +21,29 @@ export default async function TeamSettingsPage() {
   ]);
 
   return (
-    <div className="max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">Team</h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          {members.length} member{members.length === 1 ? "" : "s"} in {organization.name}.
-        </p>
-      </div>
+    <div className="space-y-7">
+      <PageHeader eyebrow="People & permissions" title="Team" description={`${members.length} member${members.length === 1 ? "" : "s"} in ${organization.name}. Build a focused team and keep every role clear.`} />
 
       {canInvite && (
-        <section>
-          <h2 className="text-sm font-medium text-neutral-900">Invite someone</h2>
-          <div className="mt-2">
+        <section className="worknest-panel rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#d92d27]">Grow your workspace</p><h2 className="mt-1 font-bold text-neutral-900">Invite someone</h2>
+          <div className="mt-4">
             <InviteMemberForm />
           </div>
         </section>
       )}
 
-      <section>
-        <h2 className="text-sm font-medium text-neutral-900">Members</h2>
-        <div className="mt-2">
+      <section className="worknest-panel rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
+        <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#d92d27]">Your people</p><h2 className="mt-1 font-bold text-neutral-900">Members</h2></div><span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-bold text-neutral-500">{members.length} total</span></div>
+        <div className="mt-4">
           <MemberList members={members} currentUserId={user.id} canManage={canManageMembers} />
         </div>
       </section>
 
       {canInvite && (
-        <section>
-          <h2 className="text-sm font-medium text-neutral-900">Pending invitations</h2>
-          <div className="mt-2">
+        <section className="worknest-panel rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#d92d27]">In progress</p><h2 className="mt-1 font-bold text-neutral-900">Pending invitations</h2>
+          <div className="mt-4">
             <PendingInvitations invitations={pendingInvitations} />
           </div>
         </section>
