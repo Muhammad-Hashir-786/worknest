@@ -6,6 +6,7 @@ import OrgSwitcher from "~/components/organization/org-switcher";
 import { getUnreadNotificationCount } from "~/services/notification";
 import SidebarNav from "~/components/dashboard/sidebar-nav";
 import WorkNestGuide from "~/components/ai/worknest-guide";
+import CommandPalette from "~/components/dashboard/command-palette";
 
 export default async function DashboardLayout({
   children,
@@ -21,10 +22,11 @@ export default async function DashboardLayout({
   const [organizations, unreadNotifications] = await Promise.all([getUserOrganizations(user.id), getUnreadNotificationCount(user.id, organization.id)]);
 
   const navItems = [
-    { label: "Overview", href: "/dashboard", icon: "◈", section: "Workspace" }, { label: "Projects", href: "/dashboard/projects", icon: "□", section: "Workspace" },
+    { label: "Overview", href: "/dashboard", icon: "◈", section: "Workspace" }, { label: "Projects", href: "/dashboard/projects", icon: "□", section: "Workspace" }, { label: "Timesheets", href: "/dashboard/timesheets", icon: "◷", section: "Workspace" },
     { label: "Clients", href: "/dashboard/clients", icon: "○", section: "Workspace" }, { label: "Reports", href: "/dashboard/reports", icon: "▤", section: "Workspace" }, { label: "Team", href: "/dashboard/settings/team", icon: "♧", section: "Manage" },
     { label: "Settings", href: "/dashboard/settings/organization", icon: "⚙", section: "Manage" },
     { label: "Notifications", href: "/dashboard/notifications", icon: "●", badge: unreadNotifications || undefined, section: "Manage" },
+    { label: "Alert preferences", href: "/dashboard/settings/notifications", icon: "◌", section: "Manage" },
     ...(role === "owner" ? [{ label: "Billing", href: "/dashboard/settings/billing", icon: "◇", section: "Manage" }] : []),
   ];
   return <div className="min-h-screen bg-[#f7f7f6] lg:flex">
@@ -36,6 +38,7 @@ export default async function DashboardLayout({
       <div className="mt-auto hidden border-t border-white/10 pt-5 lg:block"><div className="flex items-center gap-3 rounded-2xl bg-white/[0.04] p-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-red-500/15 text-xs font-bold text-red-200">{user.name.slice(0, 1).toUpperCase()}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white">{user.name}</p><p className="mt-0.5 text-[10px] uppercase tracking-wide text-neutral-500">{role}</p></div><form action={logout}><button type="submit" aria-label="Log out" className="grid h-8 w-8 place-items-center rounded-lg text-neutral-500 transition hover:bg-white/10 hover:text-white">↗</button></form></div></div>
     </aside>
     <div className="min-w-0 flex-1 lg:ml-72"><main className="dashboard-main mx-auto max-w-[1440px] px-5 py-6 sm:px-8 lg:px-12 lg:py-10">{children}</main></div>
+    <CommandPalette />
     <WorkNestGuide />
   </div>;
 }

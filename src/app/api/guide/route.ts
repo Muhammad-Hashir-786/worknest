@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentOrgContext } from "~/lib/auth/current-org";
+import { getGuideWorkspaceContext } from "~/services/guide-context";
+import { detectGuideAction } from "~/services/guide-actions";
 
 const requestSchema = z.object({ messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().trim().min(1).max(1200) })).min(1).max(8) });
 const windows = new Map<string, { startedAt: number; count: number }>();
@@ -28,7 +30,10 @@ export async function POST(request: Request) {
   if (!allowed(context.user.id)) return NextResponse.json({ error: "The guide is taking a short break. Please try again in a minute." }, { status: 429 });
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "The guide is ready, but GROQ_API_KEY has not been configured yet." }, { status: 503 });
-  const system = `You are the WorkNest Guide for ${context.organization.name}, a multi-tenant project-management workspace. Help users navigate and understand WorkNest clearly and briefly. Current capabilities include organizations and roles, clients, projects, tasks, list/Kanban/calendar task views, milestones, dependencies, recurring tasks, task templates, time tracking, reports, CSV/PDF exports, budgets, invoices, and a restricted client portal. Do not claim you can perform actions, access data, change settings, or see information that is not in this conversation. When helpful, provide the relevant WorkNest path such as /dashboard/projects. If the question is outside WorkNest, say so politely.`;
+  const latestUserMessage = [...parsed.data.messages].reverse().find((message) => message.role === "user")?.content ?? "";
+  const workspaceContext = await getGuideWorkspaceContext(context.organization.id, latestUserMessage);
+  const action = await detectGuideAction(context.organization.id, latestUserMessage);
+  const system = `You are the WorkNest Guide for ${context.organization.name}, a multi-tenant project-management workspace. Help users navigate and understand WorkNest clearly, warmly, and briefly. You have read-only access to the private workspace context below for this authenticated user's active organization. Use it to answer questions about real project names, deadlines, task statuses, clients, invoices, and links. Never invent missing data. If a matching record exists, answer directly and include its provided Markdown link. If the user asks to change data, explain what they can click and ask for confirmation; do not claim you performed an action. Current capabilities include organizations and roles, clients, projects, tasks, list/Kanban/calendar task views, milestones, dependencies, recurring tasks, task templates, time tracking, reports, CSV/PDF exports, budgets, invoices, and a restricted client portal. Format every answer as clean Markdown: start with one short bold takeaway when useful, then use a short paragraph or at most 5 concise bullet points. Use normal line breaks. Never output HTML tags, <br>, || separators, pipe tables, or long unbroken paragraphs. Keep answers under 180 words unless the user asks for detail.\n\nPRIVATE WORKSPACE CONTEXT:\n${workspaceContext}`;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15_000);
@@ -37,6 +42,6 @@ export async function POST(request: Request) {
     if (!response.ok) { console.error("Groq guide request failed", response.status); return NextResponse.json({ error: "The guide is unavailable right now. Please try again shortly." }, { status: 502 }); }
     const data = await response.json() as { choices?: { message?: { content?: string } }[] }; const answer = data.choices?.[0]?.message?.content?.trim();
     if (!answer) return NextResponse.json({ error: "The guide did not return an answer. Please try again." }, { status: 502 });
-    return NextResponse.json({ answer });
+    return NextResponse.json({ answer, action });
   } catch (error) { console.error("Groq guide network error", error); return NextResponse.json({ error: "The guide could not connect right now. Please try again." }, { status: 502 }); }
 }

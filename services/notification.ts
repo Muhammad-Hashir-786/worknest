@@ -3,6 +3,7 @@ import { isValidObjectId } from "mongoose";
 import connectDB from "~/lib/db";
 import Notification from "~/models/notifications";
 import type { NotificationType } from "~/lib/constants/roles";
+import { getNotificationPreferences } from "~/services/notification-preferences";
 
 export interface NotificationSummary {
   id: string;
@@ -22,6 +23,9 @@ export async function createNotification(params: {
   relatedTaskId?: string;
   relatedProjectId?: string;
 }): Promise<void> {
+  const preferences = await getNotificationPreferences(params.userId, params.organizationId);
+  const enabled = params.type === "task_assigned" ? preferences.taskAssignments : params.type === "status_change" ? preferences.statusChanges : params.type === "comment_mention" ? preferences.comments : params.type === "deadline_reminder" ? preferences.deadlines : true;
+  if (!enabled) return;
   await connectDB();
   await Notification.create({
     user: params.userId,

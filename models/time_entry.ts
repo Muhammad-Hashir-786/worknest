@@ -24,6 +24,8 @@ const timeEntrySchema = new mongoose.Schema(
     duration: {
       type: Number, // seconds, computed on save/stop
     },
+    billable: { type: Boolean, default: true },
+    note: { type: String, trim: true, maxlength: 500 },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );
@@ -44,5 +46,6 @@ timeEntrySchema.pre("save", async function () {
 
 timeEntrySchema.index({ user: 1, startedAt: -1 });
 
-export default mongoose.models.TimeEntry ||
-  mongoose.model("TimeEntry", timeEntrySchema);
+const existingTimeEntry = mongoose.models.TimeEntry;
+if (existingTimeEntry && !existingTimeEntry.schema.path("billable")) existingTimeEntry.schema.add({ billable: { type: Boolean, default: true }, note: { type: String, trim: true, maxlength: 500 } });
+export default existingTimeEntry || mongoose.model("TimeEntry", timeEntrySchema);
