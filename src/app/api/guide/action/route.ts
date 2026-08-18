@@ -43,5 +43,5 @@ export async function POST(request: Request) {
   const changed = await changeTaskStatus(task.id, organization.id, parsed.data.payload.status, restrict);
   if (!changed) return NextResponse.json({ error: "You can only update tasks assigned to you." }, { status: 403 });
   await logActivity({ organizationId: organization.id, userId: user.id, action: "status_changed", entityType: "Task", entityId: task.id, metadata: { status: parsed.data.payload.status, source: "guide" } });
-  return NextResponse.json({ success: true, href: `/dashboard/projects/${task.projectId}/tasks/${task.id}` });
+  return NextResponse.json({ success: true, href: `/dashboard/projects/${task.projectId}/tasks/${task.id}`, undo: { type: "change_status", payload: { taskId: task.id, projectId: task.projectId, status: task.status } } });
 }

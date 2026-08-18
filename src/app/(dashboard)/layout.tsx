@@ -22,7 +22,7 @@ export default async function DashboardLayout({
   const [organizations, unreadNotifications] = await Promise.all([getUserOrganizations(user.id), getUnreadNotificationCount(user.id, organization.id)]);
 
   const navItems = [
-    { label: "Overview", href: "/dashboard", icon: "◈", section: "Workspace" }, { label: "Projects", href: "/dashboard/projects", icon: "□", section: "Workspace" }, { label: "Timesheets", href: "/dashboard/timesheets", icon: "◷", section: "Workspace" },
+    { label: "Overview", href: "/dashboard", icon: "◈", section: "Workspace" }, { label: "Learn WorkNest", href: "/dashboard/learn", icon: "?", section: "Workspace" }, { label: "Projects", href: "/dashboard/projects", icon: "□", section: "Workspace" }, { label: "Timesheets", href: "/dashboard/timesheets", icon: "◷", section: "Workspace" },
     { label: "Clients", href: "/dashboard/clients", icon: "○", section: "Workspace" }, { label: "Reports", href: "/dashboard/reports", icon: "▤", section: "Workspace" }, { label: "Team", href: "/dashboard/settings/team", icon: "♧", section: "Manage" },
     { label: "Settings", href: "/dashboard/settings/organization", icon: "⚙", section: "Manage" },
     { label: "Notifications", href: "/dashboard/notifications", icon: "●", badge: unreadNotifications || undefined, section: "Manage" },
