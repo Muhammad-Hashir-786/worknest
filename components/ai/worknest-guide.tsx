@@ -27,9 +27,24 @@ function GuideMessage({ content }: { content: string }) {
   let list: { ordered: boolean; value: string }[] = [];
   const flushParagraph = () => { if (paragraph.length) { blocks.push(<p key={`p-${blocks.length}`}>{inlineMarkdown(paragraph.join(" "))}</p>); paragraph = []; } };
   const flushList = () => { if (list.length) { const ordered = list[0].ordered; const List = ordered ? "ol" : "ul"; blocks.push(<List key={`list-${blocks.length}`} className={`${ordered ? "list-decimal" : "list-disc"} space-y-1.5 pl-5`}>{list.map((item, index) => <li key={index}>{inlineMarkdown(item.value)}</li>)}</List>); list = []; } };
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const line = lines[lineIndex].trim();
     if (!line) { flushParagraph(); flushList(); continue; }
+    // Render Markdown tables as a real responsive table instead of exposing
+    // the pipe syntax the model used to format its answer.
+    if (line.includes("|") && lineIndex + 1 < lines.length && lines[lineIndex + 1].includes("|") && /^\s*\|?\s*:?-{2,}/.test(lines[lineIndex + 1])) {
+      flushParagraph(); flushList();
+      const rows: string[][] = [];
+      while (lineIndex < lines.length && lines[lineIndex].trim().includes("|")) {
+        const cells = lines[lineIndex].trim().replace(/^\|\s*/, "").replace(/\s*\|$/, "").split("|").map((cell) => cell.trim());
+        if (!cells.every((cell) => /^:?-{2,}:?$/.test(cell))) rows.push(cells);
+        lineIndex += 1;
+      }
+      lineIndex -= 1;
+      const headers = rows.shift() ?? [];
+      blocks.push(<div key={`table-${blocks.length}`} className="my-2 overflow-x-auto rounded-xl border border-neutral-200"><table className="min-w-full text-left text-xs"><thead className="bg-neutral-50 text-[10px] uppercase tracking-wide text-neutral-500"><tr>{headers.map((cell, index) => <th key={index} className="whitespace-nowrap px-3 py-2 font-bold">{inlineMarkdown(cell)}</th>)}</tr></thead><tbody className="divide-y divide-neutral-100 bg-white">{rows.map((row, rowIndex) => <tr key={rowIndex} className="align-top">{headers.map((_, cellIndex) => <td key={cellIndex} className="min-w-[90px] px-3 py-2 text-neutral-700">{inlineMarkdown(row[cellIndex] ?? "—")}</td>)}</tr>)}</tbody></table></div>);
+      continue;
+    }
     const heading = line.match(/^#{1,3}\s+(.+)$/);
     const bullet = line.match(/^[-*]\s+(.+)$/);
     const ordered = line.match(/^\d+[.)]\s+(.+)$/);
