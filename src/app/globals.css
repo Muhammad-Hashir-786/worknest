@@ -20,6 +20,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 ::selection { background: #f8c9c6; color: var(--ink); }
@@ -39,6 +40,13 @@ button.bg-neutral-900:hover, a.bg-neutral-900:hover { background-color: var(--br
 @keyframes dashboard-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .worknest-nav-link { color: #bdbdbd; transition: background-color 150ms ease, color 150ms ease; }
 .worknest-nav-link:hover { background: #2a2929; color: #fff; }
+.dashboard-nav::-webkit-scrollbar { display: none; }
+.lesson-picker::-webkit-scrollbar { display: none; }
+
+@media (max-width: 767px) {
+  button, a { -webkit-tap-highlight-color: transparent; }
+  .dashboard-sidebar { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+}
 
 @keyframes auth-fade-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes auth-float { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(20px, -22px, 0) scale(1.08); } }
